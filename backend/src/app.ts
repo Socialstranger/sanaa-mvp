@@ -7,6 +7,10 @@ import { notFound } from "./middleware/notfound.middleware";
 import { errorHandler } from "./middleware/error.middleware";
 import authRoutes from "./modules/auth/auth.routes";
 import testRoutes from "./routes/test.routes";
+import userRoutes from "./modules/users/user.routes";
+import artistRoutes from "./modules/artists/artist.routes";
+import artworkRoutes from "./modules/artworks/artwork.routes";
+
 
 const app = express();
 
@@ -29,6 +33,23 @@ app.use(
 );
 
 app.use("/api/v1/test", testRoutes);
+
+app.use(
+  "/api/v1/users",
+  userRoutes
+);
+
+
+app.use(
+  "/api/v1/artists",
+  artistRoutes
+);
+ 
+
+app.use(
+  "/api/v1/artworks",
+  artworkRoutes
+);
 
 app.use(notFound);
 
