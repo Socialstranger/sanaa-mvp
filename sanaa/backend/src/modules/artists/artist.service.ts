@@ -1,3 +1,8 @@
+import {
+    Op,
+    WhereOptions,
+  } from "sequelize";
+
 import sequelize from "../../config/database";
 import User from "../users/user.model";
 import ArtistProfile from "./artist.model";
@@ -12,6 +17,7 @@ interface OnboardArtistInput {
   tiktokUrl?: string;
   portfolioUrl?: string;
 }
+
 
 export const onboardArtist = async (
   userId: string,
@@ -210,4 +216,114 @@ export const updateArtistProfile =
     await artistProfile.save();
 
     return artistProfile;
+  };
+  interface GetPublicArtistsInput {
+    search?: string;
+    location?: string;
+    page: number;
+    limit: number;
+  }
+  
+  interface GetPublicArtistsInput {
+    search?: string;
+    location?: string;
+    page: number;
+    limit: number;
+  }
+  
+  interface GetPublicArtistsInput {
+    search?: string;
+    location?: string;
+    page: number;
+    limit: number;
+  }
+  
+  export const getPublicArtists = async (
+    input: GetPublicArtistsInput
+  ) => {
+    const {
+      search,
+      location,
+      page,
+      limit,
+    } = input;
+  
+    const where = {
+      ...(search
+        ? {
+            [Op.or]: [
+              {
+                displayName: {
+                  [Op.iLike]: `%${search}%`,
+                },
+              },
+              {
+                bio: {
+                  [Op.iLike]: `%${search}%`,
+                },
+              },
+            ],
+          }
+        : {}),
+  
+      ...(location
+        ? {
+            location: {
+              [Op.iLike]: `%${location}%`,
+            },
+          }
+        : {}),
+    };
+  
+    const offset =
+      (page - 1) * limit;
+  
+    const {
+      rows,
+      count,
+    } =
+      await ArtistProfile.findAndCountAll({
+        where,
+  
+        attributes: [
+          "id",
+          "userId",
+          "displayName",
+          "bio",
+          "location",
+          "websiteUrl",
+          "instagramUrl",
+          "tiktokUrl",
+          "portfolioUrl",
+          "createdAt",
+          "updatedAt",
+        ],
+  
+        order: [
+          ["createdAt", "DESC"],
+        ],
+  
+        limit,
+        offset,
+  
+        distinct: true,
+      });
+  
+    const totalPages =
+      Math.ceil(count / limit);
+  
+    return {
+      artists: rows,
+  
+      pagination: {
+        page,
+        limit,
+        totalItems: count,
+        totalPages,
+        hasNextPage:
+          page < totalPages,
+        hasPreviousPage:
+          page > 1,
+      },
+    };
   };

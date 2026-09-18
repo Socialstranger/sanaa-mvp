@@ -1,4 +1,8 @@
-
+import {
+    Op,
+    WhereOptions,
+    Order,
+  } from "sequelize";
 
 import Artwork from "./artwork.model";
 import ArtistProfile from "../artists/artist.model";
@@ -60,35 +64,172 @@ export const createArtwork = async (
 
   return artwork;
 };
-export const getPublicArtworks =
-  async () => {
-    const artworks =
-      await Artwork.findAll({
-        where: {
-          status: "PUBLISHED",
+interface GetPublicArtworksInput {
+    search?: string;
+    category?: string;
+    medium?: string;
+    sort:
+      | "newest"
+      | "oldest"
+      | "price_asc"
+      | "price_desc";
+    page: number;
+    limit: number;
+  }
+  
+  interface GetPublicArtworksInput {
+    search?: string;
+    category?: string;
+    medium?: string;
+    sort:
+      | "newest"
+      | "oldest"
+      | "price_asc"
+      | "price_desc";
+    page: number;
+    limit: number;
+  }
+  
+  export const getPublicArtworks =
+    async (
+      input: GetPublicArtworksInput
+    ) => {
+      const {
+        search,
+        category,
+        medium,
+        sort,
+        page,
+        limit,
+      } = input;
+  
+      const where = {
+        status: "PUBLISHED",
+  
+        ...(search
+          ? {
+              [Op.or]: [
+                {
+                  title: {
+                    [Op.iLike]: `%${search}%`,
+                  },
+                },
+                {
+                  description: {
+                    [Op.iLike]: `%${search}%`,
+                  },
+                },
+                {
+                  category: {
+                    [Op.iLike]: `%${search}%`,
+                  },
+                },
+                {
+                  medium: {
+                    [Op.iLike]: `%${search}%`,
+                  },
+                },
+              ],
+            }
+          : {}),
+  
+        ...(category
+          ? {
+              category: {
+                [Op.iLike]: category,
+              },
+            }
+          : {}),
+  
+        ...(medium
+          ? {
+              medium: {
+                [Op.iLike]: medium,
+              },
+            }
+          : {}),
+      };
+  
+      let order: Order;
+  
+      switch (sort) {
+        case "oldest":
+          order = [
+            ["createdAt", "ASC"],
+          ];
+          break;
+  
+        case "price_asc":
+          order = [
+            ["price", "ASC"],
+          ];
+          break;
+  
+        case "price_desc":
+          order = [
+            ["price", "DESC"],
+          ];
+          break;
+  
+        case "newest":
+        default:
+          order = [
+            ["createdAt", "DESC"],
+          ];
+          break;
+      }
+  
+      const offset =
+        (page - 1) * limit;
+  
+      const {
+        rows,
+        count,
+      } =
+        await Artwork.findAndCountAll({
+          where,
+  
+          include: [
+            {
+              model: ArtistProfile,
+              as: "artist",
+              attributes: [
+                "id",
+                "userId",
+                "displayName",
+                "bio",
+                "location",
+              ],
+            },
+          ],
+  
+          order,
+  
+          limit,
+  
+          offset,
+  
+          distinct: true,
+        });
+  
+      const totalPages =
+        Math.ceil(count / limit);
+  
+      return {
+        artworks: rows,
+  
+        pagination: {
+          page,
+          limit,
+          totalItems: count,
+          totalPages,
+          hasNextPage:
+            page < totalPages,
+          hasPreviousPage:
+            page > 1,
         },
-
-        include: [
-          {
-            model: ArtistProfile,
-            as: "artist",
-            attributes: [
-              "id",
-              "userId",
-              "displayName",
-              "bio",
-              "location",
-            ],
-          },
-        ],
-
-        order: [
-          ["createdAt", "DESC"],
-        ],
-      });
-
-    return artworks;
-  };
+      };
+    };
   export const getPublicArtworkById =
   async (artworkId: string) => {
     const artwork =

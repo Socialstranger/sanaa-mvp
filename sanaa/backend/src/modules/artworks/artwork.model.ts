@@ -168,6 +168,9 @@ import {
         {
           fields: ["category"],
         },
+        {
+          fields: ["medium"],
+        },
       ],
     }
   );

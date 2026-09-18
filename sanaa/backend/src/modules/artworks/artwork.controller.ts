@@ -48,25 +48,35 @@ import {
   };
   
   export const getAll = async (
-    _req: Request,
+    req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
       const artworks =
-        await getPublicArtworks();
+        await getPublicArtworks(
+          req.query as unknown as {
+            search?: string;
+            category?: string;
+            medium?: string;
+            sort:
+              | "newest"
+              | "oldest"
+              | "price_asc"
+              | "price_desc";
+            page: number;
+            limit: number;
+          }
+        );
   
       res.status(200).json({
         success: true,
-        data: {
-          artworks,
-        },
+        data: artworks,
       });
     } catch (error) {
       next(error);
     }
   };
-  
   export const getOne = async (
     req: Request,
     res: Response,

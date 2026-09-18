@@ -19,22 +19,25 @@ import { validate } from "../../middleware/validate.middleware";
 import {
   createArtworkSchema,
   updateArtworkSchema,
+  getArtworksQuerySchema,
+  getArtworkByIdSchema,
 } from "./artwork.validation";
 
 const router = Router();
 
 /*
- * Public routes
+ * Public artwork discovery
  */
 
 router.get(
   "/",
+  validate(getArtworksQuerySchema),
   getAll
 );
 
 /*
- * Artist-specific route
- * Must come BEFORE /:id
+ * Artist portfolio
+ * MUST come before /:id
  */
 
 router.get(
@@ -45,16 +48,19 @@ router.get(
 );
 
 /*
- * Public single artwork route
+ * Public single artwork
  */
 
 router.get(
-  "/:id",
-  getOne
-);
+    "/:id",
+    validate(
+      getArtworkByIdSchema
+    ),
+    getOne
+  );
 
 /*
- * Artist routes
+ * Create artwork
  */
 
 router.post(
@@ -65,6 +71,10 @@ router.post(
   create
 );
 
+/*
+ * Update artwork
+ */
+
 router.patch(
   "/:id",
   protect,
@@ -72,6 +82,10 @@ router.patch(
   validate(updateArtworkSchema),
   update
 );
+
+/*
+ * Delete artwork
+ */
 
 router.delete(
   "/:id",

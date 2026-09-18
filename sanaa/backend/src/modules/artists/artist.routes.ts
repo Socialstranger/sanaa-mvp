@@ -4,6 +4,7 @@ import {
   onboard,
   getMyArtistProfile,
   updateMyArtistProfile,
+  getAll,
 } from "./artist.controller";
 
 import {
@@ -16,6 +17,8 @@ import { validate } from "../../middleware/validate.middleware";
 import {
   onboardArtistSchema,
   updateArtistSchema,
+  getArtistsQuerySchema,
+  
 } from "./artist.validation";
 
 const router = Router();
@@ -42,5 +45,9 @@ router.patch(
   validate(updateArtistSchema),
   updateMyArtistProfile
 );
-
+router.get(
+    "/",
+    validate(getArtistsQuerySchema),
+    getAll
+  );
 export default router;

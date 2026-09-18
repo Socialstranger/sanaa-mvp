@@ -140,3 +140,53 @@ export const updateArtistSchema =
         .optional(),
     }),
   });
+  export const getArtistsQuerySchema =
+  z.object({
+    query: z.object({
+      search: z
+        .string()
+        .trim()
+        .min(
+          1,
+          "Search term cannot be empty"
+        )
+        .max(
+          100,
+          "Search term cannot exceed 100 characters"
+        )
+        .optional(),
+
+      location: z
+        .string()
+        .trim()
+        .max(
+          120,
+          "Location cannot exceed 120 characters"
+        )
+        .optional(),
+
+      page: z
+        .coerce
+        .number()
+        .int()
+        .min(
+          1,
+          "Page must be at least 1"
+        )
+        .default(1),
+
+      limit: z
+        .coerce
+        .number()
+        .int()
+        .min(
+          1,
+          "Limit must be at least 1"
+        )
+        .max(
+          50,
+          "Limit cannot exceed 50"
+        )
+        .default(20),
+    }),
+  });

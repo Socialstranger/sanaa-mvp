@@ -10,6 +10,9 @@ import testRoutes from "./routes/test.routes";
 import userRoutes from "./modules/users/user.routes";
 import artistRoutes from "./modules/artists/artist.routes";
 import artworkRoutes from "./modules/artworks/artwork.routes";
+import favoriteRoutes from "./modules/favourites/favourite.routes";
+import inquiryRoutes from "./modules/inquiries/inquiry.routes";
+import adminRoutes from "./modules/admin/admin.routes";
 
 
 const app = express();
@@ -51,6 +54,20 @@ app.use(
   artworkRoutes
 );
 
+app.use(
+  "/api/v1/favorites",
+  favoriteRoutes
+);
+
+app.use(
+  "/api/v1/inquiries",
+  inquiryRoutes
+);
+
+app.use(
+  "/api/v1/admin",
+  adminRoutes
+);
 app.use(notFound);
 
 app.use(errorHandler);

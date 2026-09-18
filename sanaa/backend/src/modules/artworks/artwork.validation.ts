@@ -179,3 +179,81 @@ export const createArtworkSchema =
         .optional(),
     }),
   });
+  export const getArtworksQuerySchema =
+  z.object({
+    query: z.object({
+      search: z
+        .string()
+        .trim()
+        .min(
+          1,
+          "Search term cannot be empty"
+        )
+        .max(
+          100,
+          "Search term cannot exceed 100 characters"
+        )
+        .optional(),
+
+      category: z
+        .string()
+        .trim()
+        .max(
+          100,
+          "Category cannot exceed 100 characters"
+        )
+        .optional(),
+
+      medium: z
+        .string()
+        .trim()
+        .max(
+          150,
+          "Medium cannot exceed 150 characters"
+        )
+        .optional(),
+
+      sort: z
+        .enum([
+          "newest",
+          "oldest",
+          "price_asc",
+          "price_desc",
+        ])
+        .default("newest"),
+
+      page: z
+        .coerce
+        .number()
+        .int()
+        .min(
+          1,
+          "Page must be at least 1"
+        )
+        .default(1),
+
+      limit: z
+        .coerce
+        .number()
+        .int()
+        .min(
+          1,
+          "Limit must be at least 1"
+        )
+        .max(
+          50,
+          "Limit cannot exceed 50"
+        )
+        .default(20),
+    }),
+  });
+  export const getArtworkByIdSchema =
+  z.object({
+    params: z.object({
+      id: z
+        .string()
+        .uuid(
+          "Artwork ID must be a valid UUID"
+        ),
+    }),
+  });

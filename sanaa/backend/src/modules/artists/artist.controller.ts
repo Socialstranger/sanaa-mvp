@@ -8,6 +8,7 @@ import {
     onboardArtist,
     getArtistProfile,
     updateArtistProfile,
+    getPublicArtists,
   } from "./artist.service";
   
   import AppError from "../../utils/AppError";
@@ -104,3 +105,28 @@ import {
         next(error);
       }
     };
+    export const getAll =
+  async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const result =
+        await getPublicArtists(
+          req.query as unknown as{
+            search?: string;
+            location?: string;
+            page: number;
+            limit: number;
+          }
+        );
+
+      res.status(200).json({
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
